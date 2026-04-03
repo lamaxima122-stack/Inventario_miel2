@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Negocio de Miel</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--color-background-primary:#fff;--color-background-secondary:#f3f4f6;--color-text-primary:#111827;--color-text-secondary:#6b7280;--color-border-secondary:#d1d5db;--color-border-tertiary:#e5e7eb;--border-radius-md:8px;--border-radius-lg:12px;--font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{background:var(--color-background-secondary)}
+.app{max-width:420px;margin:0 auto;background:var(--color-background-primary);font-family:var(--font-sans);padding-bottom:24px;min-height:100vh}
+.topbar{padding:14px 16px 10px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between}
+.topbar-left h1{font-size:17px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px}
+.topbar-left p{font-size:12px;color:var(--color-text-secondary)}
+.live-time{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.nav{display:flex;background:var(--color-background-secondary);border-radius:var(--border-radius-lg);margin:12px 16px;padding:3px;gap:3px}
+.nav-btn{flex:1;padding:8px 0;font-size:13px;font-weight:500;text-align:center;border:none;background:none;color:var(--color-text-secondary);border-radius:10px;cursor:pointer}
+.nav-btn.active{background:var(--color-background-primary);color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);box-shadow:0 1px 2px rgba(0,0,0,0.05)}
+.page{display:none;padding:0 16px}
+.page.active{display:block}
+.sec-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.kpi{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px}
+.kpi.full{grid-column:1/-1}
+.kpi lbl{font-size:11px;color:var(--color-text-secondary);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+.kpi .v{font-size:21px;font-weight:500;color:var(--color-text-primary)}
+.kpi .sub{font-size:11px;color:var(--color-text-secondary);margin-top:3px}
+.amber{color:#854F0B!important}
+.red{color:#993C1D!important}
+.blue{color:#185FA5!important}
+.green{color:#0F6E56!important}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.02)}
+.card h3{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.field{margin-bottom:10px}
+.field label{font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:4px}
+.field input,.field select{width:100%;padding:9px 11px;font-size:14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary)}
+.btn{width:100%;padding:10px;border:none;border-radius:var(--border-radius-md);font-size:14px;font-weight:500;cursor:pointer;color:#fff;margin-top:4px}
+.bg-amber{background:#BA7517}
+.bg-blue{background:#185FA5}
+.bg-gray{background:var(--color-text-secondary);margin-top:10px;}
+.ts-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary);background:var(--color-background-secondary);border-radius:20px;padding:2px 8px;margin-top:5px}
+.ts-icon{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.item{padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.item:last-child{border-bottom:none}
+.item-top{display:flex;justify-content:space-between;align-items:flex-start}
+.item-desc{font-size:14px;color:var(--color-text-primary);font-weight:500}
+.item-amount{font-size:15px;font-weight:500}
+.item-meta{display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap}
+.pill{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500}
+.pill-amber{background:#FAEEDA;color:#633806}
+.pill-red{background:#FAECE7;color:#712B13}
+.pill-blue{background:#E6F1FB;color:#0C447C}
+.pill-gray{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.del-btn{background:none;border:none;color:var(--color-text-secondary);cursor:pointer;font-size:18px;line-height:1;padding:0 2px;margin-left:6px}
+.empty{text-align:center;padding:20px 0;font-size:14px;color:var(--color-text-secondary)}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-lbl{font-size:12px;color:var(--color-text-secondary);width:80px;text-align:right;white-space:nowrap}
+.bar-track{flex:1;height:18px;background:var(--color-background-secondary);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width 0.3s ease}
+.bar-amt{font-size:12px;width:68px;font-weight:500}
+.filter-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.f-btn{font-size:12px;padding:5px 12px;border:0.5px solid var(--color-border-secondary);border-radius:20px;background:none;color:var(--color-text-secondary);cursor:pointer}
+.f-btn.on{background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary)}
+.trend-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.trend-row:last-child{border-bottom:none}
+.trend-label{font-size:13px;color:var(--color-text-primary)}
+.trend-val{font-size:13px;font-weight:500}
+.nota-auto{font-size:12px;color:var(--color-text-secondary);margin-bottom:10px;display:flex;align-items:center;gap:5px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="topbar">
+  <div class="topbar-left">
+    <h1>Negocio de miel</h1>
+    <p id="fecha-hoy"></p>
+  </div>
+  <div class="live-time" id="reloj"></div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="goPage('inicio')">Resumen</button>
+  <button class="nav-btn" onclick="goPage('negocio')">Negocio</button>
+  <button class="nav-btn" onclick="goPage('personal')">Personal</button>
+</div>
+
+<div id="page-inicio" class="page active">
+  <p class="sec-label">Negocio de miel — acumulado</p>
+  <div class="kpi-grid">
+    <div class="kpi full">
+      <lbl>Progreso Meta Inicial (RD$ 20,250)</lbl>
+      <div class="bar-track" style="height:12px; margin: 8px 0;">
+        <div id="k-meta-fill" class="bar-fill" style="width:0%; background:#0F6E56"></div>
+      </div>
+      <div class="sub" id="k-meta-text" style="font-weight:500">0% completado</div>
+    </div>
+    <div class="kpi"><lbl>Total vendido</lbl><div class="v amber" id="k-ventas">RD$0</div><div class="sub" id="k-ventas-n">0 ventas</div></div>
+    <div class="kpi"><lbl>Gastos negocio</lbl><div class="v red" id="k-gneg">RD$0</div><div class="sub" id="k-gneg-n">0 gastos</div></div>
+    <div class="kpi full"><lbl>Ganancia neta del negocio</lbl><div class="v" id="k-gan">RD$0</div><div class="sub" id="k-gan-sub"></div></div>
+  </div>
+  <p class="sec-label">Gastos personales — acumulado</p>
+  <div class="kpi-grid">
+    <div class="kpi"><lbl>Total personal</lbl><div class="v blue" id="k-gper">RD$0</div><div class="sub" id="k-gper-n">0 registros</div></div>
+    <div class="kpi"><lbl>Mayor categoría</lbl><div class="v" style="font-size:15px" id="k-topcat">—</div><div class="sub" id="k-topcat-v"></div></div>
+  </div>
+  <div class="card">
+    <h3>Comparativa visual</h3>
+    <div id="barchart"><p class="empty">Agrega registros para ver la gráfica.</p></div>
+  </div>
+  <div class="card">
+    <h3>Últimos movimientos</h3>
+    <div id="ultimos"><p class="empty">Sin movimientos aún.</p></div>
+  </div>
+  <button class="btn bg-gray" onclick="exportCSV()">⬇ Exportar datos a Excel (CSV)</button>
+</div>
+
+<div id="page-negocio" class="page">
+  <p class="sec-label">Nuevo registro</p>
+  <div class="card">
+    <div class="row2">
+      <div class="field"><label>Tipo</label>
+        <select id="neg-tipo" onchange="toggleNegCat()">
+          <option value="venta">Venta de sobres</option>
+          <option value="gasto">Gasto del negocio</option>
+        </select>
+      </div>
+      <div class="field"><label>Monto (RD$)</label>
+        <input id="neg-monto" type="number" placeholder="0">
+      </div>
+    </div>
+
+    <div id="cat-venta-wrap">
+      <div class="row2">
+        <div class="field"><label>Tipo de producto</label>
+          <select id="neg-cat-venta">
+            <option>Sobre individual</option>
+            <option>Paquete de 10 sobres</option>
+            <option>Paquete de 25 sobres</option>
+            <option>Paquete de 50 sobres</option>
+            <option>Caja de 100 sobres</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="field"><label>Cantidad vendida</label>
+          <input id="neg-cantidad" type="number" placeholder="1" min="1">
+        </div>
+      </div>
+    </div>
+
+    <div id="cat-gasto-wrap" style="display:none">
+      <div class="field"><label>Categoría del gasto</label>
+        <select id="neg-cat-gasto">
+          <option>Sobres / empaques</option>
+          <option>Etiquetas</option>
+          <option>Materia prima</option>
+          <option>Transporte / entrega</option>
+          <option>Sellado y empaque</option>
+          <option>Publicidad / redes</option>
+          <option>Equipos</option>
+          <option>Otro</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field"><label>Descripción</label>
+      <input id="neg-desc" placeholder="Ej: Pedido WhatsApp...">
+    </div>
+    <div class="field"><label>Método de pago</label>
+      <select id="neg-pago">
+        <option>Efectivo</option><option>Transferencia</option><option>Tarjeta</option>
+      </select>
+    </div>
+    <button class="btn bg-amber" onclick="addNeg()">Guardar registro</button>
+  </div>
+
+  <p class="sec-label">Historial del negocio</p>
+  <div class="filter-row">
+    <button class="f-btn on" onclick="setFiltroNeg('todo',this)">Todo</button>
+    <button class="f-btn" onclick="setFiltroNeg('venta',this)">Ventas</button>
+    <button class="f-btn" onclick="setFiltroNeg('gasto',this)">Gastos</button>
+  </div>
+  <div class="card"><div id="lista-neg"><p class="empty">Sin registros aún.</p></div></div>
+</div>
+
+<div id="page-personal" class="page">
+  <p class="sec-label">Nuevo gasto personal</p>
+  <div class="card">
+    <div class="row2">
+      <div class="field"><label>Categoría</label>
+        <select id="per-cat">
+          <option>Comida</option><option>Transporte</option><option>Servicios básicos</option>
+          <option>Salud</option><option>Entretenimiento</option><option>Ropa</option>
+          <option>Educación</option><option>Otro</option>
+        </select>
+      </div>
+      <div class="field"><label>Monto (RD$)</label>
+        <input id="per-monto" type="number" placeholder="0">
+      </div>
+    </div>
+    <div class="field"><label>Descripción</label>
+      <input id="per-desc" placeholder="Ej: Gasolina, almuerzo...">
+    </div>
+    <div class="field"><label>Método de pago</label>
+      <select id="per-pago">
+        <option>Efectivo</option><option>Transferencia</option><option>Tarjeta</option>
+      </select>
+    </div>
+    <button class="btn bg-blue" onclick="addPer()">Guardar gasto personal</button>
+  </div>
+
+  <p class="sec-label">Historial personal</p>
+  <div class="filter-row" id="cat-filters"><button class="f-btn on" onclick="setFiltroPer('todo',this)">Todo</button></div>
+  <div class="card"><div id="lista-per"><p class="empty">Sin gastos personales aún.</p></div></div>
+</div>
+
+</div>
+
+<script>
+const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const diasSem=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+
+// Persistencia en LocalStorage
+let neg = JSON.parse(localStorage.getItem('miel_data_neg')) || [];
+let per = JSON.parse(localStorage.getItem('miel_data_per')) || [];
+let filtroNeg='todo', filtroPerCat='todo';
+
+function saveLocal() {
+  localStorage.setItem('miel_data_neg', JSON.stringify(neg));
+  localStorage.setItem('miel_data_per', JSON.stringify(per));
+}
+
+function nowTs(){
+  const d=new Date();
+  const h=String(d.getHours()).padStart(2,'0');
+  const m=String(d.getMinutes()).padStart(2,'0');
+  const s=String(d.getSeconds()).padStart(2,'0');
+  return {
+    display:`${diasSem[d.getDay()]}, ${d.getDate()} de ${meses[d.getMonth()]} ${d.getFullYear()} · ${h}:${m}:${s}`,
+    fecha:`${d.getDate()} de ${meses[d.getMonth()]} ${d.getFullYear()}`,
+    hora:`${h}:${m}`,
+    raw: d.getTime() // Cambiado a getTime() para correcto parseo y ordenamiento JSON
+  };
+}
+
+function initClock(){
+  const d=new Date();
+  document.getElementById('fecha-hoy').textContent=diasSem[d.getDay()]+', '+d.getDate()+' de '+meses[d.getMonth()]+' '+d.getFullYear();
+  setInterval(()=>{
+    const n=new Date();
+    document.getElementById('reloj').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
+  },1000);
+}
+
+function toggleNegCat(){
+  const v=document.getElementById('neg-tipo').value;
+  document.getElementById('cat-venta-wrap').style.display=v==='venta'?'block':'none';
+  document.getElementById('cat-gasto-wrap').style.display=v==='gasto'?'block':'none';
+}
+
+function fmt(n){return 'RD$'+Math.round(n).toLocaleString('es-DO');}
+
+function goPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const idx={inicio:0,negocio:1,personal:2}[name];
+  document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+}
+
+function addNeg(){
+  const tipo=document.getElementById('neg-tipo').value;
+  const monto=parseFloat(document.getElementById('neg-monto').value);
+  const desc=document.getElementById('neg-desc').value.trim();
+  const pago=document.getElementById('neg-pago').value;
+  if(!monto||monto<=0)return;
+  let cat, extra='';
+  if(tipo==='venta'){
+    cat=document.getElementById('neg-cat-venta').value;
+    const cant=parseInt(document.getElementById('neg-cantidad').value)||1;
+    extra=cant>1?` · ${cant} unid.`:'';
+  } else {
+    cat=document.getElementById('neg-cat-gasto').value;
+  }
+  neg.unshift({id:Date.now(), tipo,monto,desc:desc||(tipo==='venta'?'Venta de sobres':'Gasto'),cat,extra,pago,ts:nowTs()});
+  
+  saveLocal();
+  document.getElementById('neg-monto').value='';
+  document.getElementById('neg-desc').value='';
+  if(tipo==='venta') document.getElementById('neg-cantidad').value='';
+  render();
+}
+
+function addPer(){
+  const cat=document.getElementById('per-cat').value;
+  const monto=parseFloat(document.getElementById('per-monto').value);
+  const desc=document.getElementById('per-desc').value.trim();
+  const pago=document.getElementById('per-pago').value;
+  if(!monto||monto<=0)return;
+  
+  per.unshift({id:Date.now(), cat,monto,desc:desc||cat,pago,ts:nowTs()});
+  
+  saveLocal();
+  document.getElementById('per-monto').value='';
+  document.getElementById('per-desc').value='';
+  buildCatFilters();
+  render();
+}
+
+function delNeg(id){neg=neg.filter(x=>x.id!==id);saveLocal();render();}
+function delPer(id){per=per.filter(x=>x.id!==id);saveLocal();buildCatFilters();render();}
+
+function setFiltroNeg(v,btn){
+  filtroNeg=v;
+  document.querySelectorAll('#page-negocio .filter-row .f-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');render();
+}
+
+function buildCatFilters(){
+  const cats=['todo',...new Set(per.map(x=>x.cat))];
+  document.getElementById('cat-filters').innerHTML=cats.map(c=>`<button class="f-btn ${c===filtroPerCat?'on':''}" onclick="setFiltroPer('${c}',this)">${c==='todo'?'Todo':c}</button>`).join('');
+}
+
+function setFiltroPer(v,btn){
+  filtroPerCat=v;
+  document.querySelectorAll('#cat-filters .f-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');render();
+}
+
+function tsIcon(){return `<svg class="ts-icon" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5"/><path d="M6 3v3l2 1.5"/></svg>`;}
+
+function itemNeg(x){
+  const esV=x.tipo==='venta';
+  return `<div class="item">
+    <div class="item-top">
+      <span class="item-desc">${x.desc}</span>
+      <div style="display:flex;align-items:center">
+        <span class="item-amount ${esV?'amber':'red'}">${esV?'+':'−'}${fmt(x.monto)}</span>
+        <button class="del-btn" onclick="delNeg(${x.id})">×</button>
+      </div>
+    </div>
+    <div class="item-meta">
+      <span class="pill ${esV?'pill-amber':'pill-red'}">${esV?'Venta':'Gasto negocio'}</span>
+      <span class="pill pill-gray">${x.cat}${x.extra||''}</span>
+      <span class="pill pill-gray">${x.pago}</span>
+    </div>
+    <div class="ts-badge">${tsIcon()} ${x.ts.display}</div>
+  </div>`;
+}
+
+function itemPer(x){
+  return `<div class="item">
+    <div class="item-top">
+      <span class="item-desc">${x.desc}</span>
+      <div style="display:flex;align-items:center">
+        <span class="item-amount blue">−${fmt(x.monto)}</span>
+        <button class="del-btn" onclick="delPer(${x.id})">×</button>
+      </div>
+    </div>
+    <div class="item-meta">
+      <span class="pill pill-blue">${x.cat}</span>
+      <span class="pill pill-gray">${x.pago}</span>
+    </div>
+    <div class="ts-badge">${tsIcon()} ${x.ts.display}</div>
+  </div>`;
+}
+
+function exportCSV() {
+  let csv = "Tipo,Categoria,Descripcion,Metodo Pago,Monto,Fecha\n";
+  neg.forEach(x => csv += `Negocio (${x.tipo}),${x.cat},${x.desc},${x.pago},${x.tipo==='venta'?x.monto:-x.monto},${x.ts.display}\n`);
+  per.forEach(x => csv += `Personal,${x.cat},${x.desc},${x.pago},${-x.monto},${x.ts.display}\n`);
+  
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "registros_miel.csv";
+  link.click();
+}
+
+function render(){
+  const ventas=neg.filter(x=>x.tipo==='venta');
+  const gastosNeg=neg.filter(x=>x.tipo==='gasto');
+  const tv=ventas.reduce((a,x)=>a+x.monto,0);
+  const tg=gastosNeg.reduce((a,x)=>a+x.monto,0);
+  const tp=per.reduce((a,x)=>a+x.monto,0);
+  const gan=tv-tg;
+
+  // Calculo Meta
+  const meta = 20250;
+  const progreso = Math.min((Math.max(gan, 0) / meta) * 100, 100);
+  document.getElementById('k-meta-fill').style.width = progreso + '%';
+  document.getElementById('k-meta-text').textContent = `${progreso.toFixed(1)}% de RD$20,250 completado`;
+
+  document.getElementById('k-ventas').textContent=fmt(tv);
+  document.getElementById('k-ventas-n').textContent=ventas.length+(ventas.length===1?' venta':' ventas');
+  document.getElementById('k-gneg').textContent=fmt(tg);
+  document.getElementById('k-gneg-n').textContent=gastosNeg.length+(gastosNeg.length===1?' gasto':' gastos');
+  
+  const kg=document.getElementById('k-gan');
+  kg.textContent=fmt(gan);
+  kg.className='v '+(gan>=0?'green':'red');
+  document.getElementById('k-gan-sub').textContent=gan>=0?'Tu negocio está generando ganancia':'Estás gastando más de lo que vendes';
+  
+  document.getElementById('k-gper').textContent=fmt(tp);
+  document.getElementById('k-gper-n').textContent=per.length+(per.length===1?' registro':' registros');
+
+  const catMap={};
+  per.forEach(x=>{catMap[x.cat]=(catMap[x.cat]||0)+x.monto;});
+  const top=Object.entries(catMap).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('k-topcat').textContent=top?top[0]:'—';
+  document.getElementById('k-topcat-v').textContent=top?fmt(top[1]):'';
+
+  const mx=Math.max(tv,tg,tp,1);
+  const bc=document.getElementById('barchart');
+  if(!tv&&!tg&&!tp){bc.innerHTML='<p class="empty">Agrega registros para ver la gráfica.</p>';}
+  else{bc.innerHTML=[
+    {lbl:'Ventas',val:tv,color:'#BA7517'},
+    {lbl:'Gasto neg.',val:tg,color:'#D85A30'},
+    {lbl:'Gasto per.',val:tp,color:'#185FA5'},
+  ].map(r=>`<div class="bar-row">
+    <span class="bar-lbl">${r.lbl}</span>
+    <div class="bar-track"><div class="bar-fill" style="width:${Math.round(r.val/mx*100)}%;background:${r.color}"></div></div>
+    <span class="bar-amt" style="color:${r.color}">${fmt(r.val)}</span>
+  </div>`).join('');}
+
+  const todos=[...neg.map(x=>({...x,_s:'neg'})),...per.map(x=>({...x,_s:'per'}))]
+    .sort((a,b)=>b.ts.raw-a.ts.raw).slice(0,6);
+  const ul=document.getElementById('ultimos');
+  ul.innerHTML=todos.length?todos.map(x=>{
+    const esV=x.tipo==='venta'; const esPer=x._s==='per';
+    const color=esPer?'blue':esV?'amber':'red';
+    return `<div class="trend-row">
+      <div><div class="trend-label">${x.desc}</div>
+      <div style="font-size:11px;color:var(--color-text-secondary)">${x.ts.fecha} · ${x.ts.hora} · ${esPer?x.cat:esV?'Venta':'Gasto neg.'}</div></div>
+      <span class="trend-val ${color}">${esV?'+':'−'}${fmt(x.monto)}</span>
+    </div>`;
+  }).join(''):'<p class="empty">Sin movimientos aún.</p>';
+
+  const fn=neg.filter(x=>filtroNeg==='todo'||x.tipo===filtroNeg);
+  document.getElementById('lista-neg').innerHTML=fn.length?fn.map((x)=>itemNeg(x)).join(''):'<p class="empty">Sin registros.</p>';
+
+  const fp=per.filter(x=>filtroPerCat==='todo'||x.cat===filtroPerCat);
+  document.getElementById('lista-per').innerHTML=fp.length?fp.map((x)=>itemPer(x)).join(''):'<p class="empty">Sin gastos.</p>';
+}
+
+buildCatFilters();
+initClock();
+render();
+</script>
+</body>
+</html>
